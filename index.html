@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portafolio Interactivo</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.277.0/lucide.min.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; overflow: hidden; }
         .fade-in { opacity: 0; transform: translateY(20px); transition: all 0.6s ease-in-out; }
@@ -20,15 +22,24 @@
     <div id="game-area" class="hidden w-full h-screen flex items-center justify-center flex-col">
         <p class="text-2xl font-semibold fade-in">Haz clic en los elementos para descubrir más</p>
         <div class="grid grid-cols-3 gap-6 mt-6">
-            <div class="game-item w-24 h-24 bg-indigo-500 rounded-lg cursor-pointer fade-in"></div>
-            <div class="game-item w-24 h-24 bg-indigo-500 rounded-lg cursor-pointer fade-in"></div>
-            <div class="game-item w-24 h-24 bg-indigo-500 rounded-lg cursor-pointer fade-in"></div>
+            <div class="game-item w-24 h-24 bg-indigo-500 rounded-lg cursor-pointer flex flex-col items-center justify-center fade-in" data-target="perfil">
+                <i data-lucide="user" class="text-white w-8 h-8"></i>
+                <span>Perfil</span>
+            </div>
+            <div class="game-item w-24 h-24 bg-indigo-500 rounded-lg cursor-pointer flex flex-col items-center justify-center fade-in" data-target="proyectos">
+                <i data-lucide="code" class="text-white w-8 h-8"></i>
+                <span>Proyectos</span>
+            </div>
+            <div class="game-item w-24 h-24 bg-indigo-500 rounded-lg cursor-pointer flex flex-col items-center justify-center fade-in" data-target="redes">
+                <i data-lucide="globe" class="text-white w-8 h-8"></i>
+                <span>Redes</span>
+            </div>
         </div>
     </div>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            lucide.createIcons();
             gsap.to(".fade-in", { opacity: 1, y: 0, stagger: 0.3 });
             
             document.getElementById("start-btn").addEventListener("click", () => {
@@ -37,6 +48,13 @@
                     document.getElementById("game-area").classList.remove("hidden");
                     gsap.fromTo(".game-item", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, stagger: 0.2, duration: 0.5 });
                 }});
+            });
+            
+            document.querySelectorAll(".game-item").forEach(item => {
+                item.addEventListener("click", () => {
+                    const target = item.dataset.target;
+                    alert(`Navegando a ${target}`); // Aquí puedes implementar una navegación real
+                });
             });
         });
     </script>
