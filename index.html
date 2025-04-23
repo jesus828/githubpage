@@ -1,161 +1,400 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>TV Perú en Vivo</title>
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-  <style>
-    html, body {
-      margin: 0;
-      background: black;
-      height: 100%;
-      overflow: hidden;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Portafolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Amatic+SC:wght@400;700&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+    <style>
+        /* Reset y estilos generales */
+        * {
+            font-family: "Manrope", sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+        body {
+            overflow: hidden;
+            position: relative;
+        }
 
-    video {
-      width: 100vw;
-      height: 100vh;
-      background-color: black;
-    }
+        /* Fondo circular animado */
+        .circle-bg {
+            position: fixed;
+            top: 0%;
+            left: 0%;
+            width: 100vw;
+            height: 100vh;
+            clip-path: circle(0% at center);
+            transition: clip-path 0.4s ease-in-out, background 0.4s ease-in-out;
+            z-index: -1;
+        }
+        .circle-border {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 300px;
+            height: 300px;
+            border: 4px dashed #fff;
+            border-radius: 100%;
+            z-index: -1;
+            transition: transform 0.4s ease-in-out;
+            animation: rotateCircle 1s linear infinite;
+        }
+        @keyframes rotateCircle {
+            from {
+                transform: translate(-50%, -50%) rotate(0deg) scale(1.8);
+            }
+            to {
+                transform: translate(-50%, -50%) rotate(360deg) scale(1.8);
+            }
+        }
+        .circle-border2 {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 300px;
+            height: 300px;
+            border: 2px solid #fff;
+            border-radius: 100%;
+            z-index: -1;
+            transition: transform 0.4s ease-in-out;
+        }
 
-    #nombre-canal {
-      position: absolute;
-      top: 10px;
-      left: 20px;
-      color: white;
-      font-size: 20px;
-      font-family: sans-serif;
-      background: rgba(0,0,0,0.5);
-      padding: 5px 10px;
-      border-radius: 8px;
-      z-index: 10;
-    }
-  </style>
+        /* Menú de navegación */
+        nav {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+
+        nav ul {
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            height: 200px;
+            align-items: center;
+        }
+
+        nav ul li {
+            list-style: none;
+            opacity: 0; /* Inicialmente oculto para animación */
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            position: absolute;
+        }
+
+        /* Mostrar los ítems cuando aparecen en la pantalla */
+        nav ul li.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        nav ul li a {
+            font-family: "Alfa Slab One", serif;
+            text-decoration: none;
+            font-size: 120px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 12px;
+            position: relative;
+            transition: opacity 0.3s ease, letter-spacing 0.3s ease;
+
+            /* Ajustes para background-clip */
+            background-image: url(fondo.webp);
+            background-size: cover;
+            background-position: right;
+            
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+
+            /* Borde al texto */
+            -webkit-text-stroke: 3px rgb(0, 0, 0);
+        }
+
+        nav ul li a::after {
+            content: "";
+            width: 0%;
+            height: 4px;
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            background: #000;
+            transition: width 0.3s ease-in-out;
+            mix-blend-mode: difference;
+            border: 2px dashed #000000;
+        }
+
+        nav ul li.visible a::after {
+            width: 100%;
+        }
+        nav ul li a::before {
+            content: "";
+            width: 100%;
+            height: 12px;
+            position: absolute;
+            left: 0;
+            bottom: -4px;
+            background: #00000000;
+            transition: width 0.3s ease-in-out;
+            mix-blend-mode: difference;
+            border: 2px dashed #000000;
+        }
+        /* Subrayado animado */
+        .line-animado{
+            font-family: "Alfa Slab One", serif;
+            text-decoration: none;
+            font-size: 120px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 12px;
+            position: absolute;
+            color: transparent;
+        }
+
+        /* Opacidad reducida en elementos inactivos */
+        nav ul li.active{
+            z-index: 2;
+        }   
+
+        nav ul li:not(.active) a {
+            opacity: 0;
+            letter-spacing: 4px;
+        }
+
+        /* Contenedor principal */
+        main {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+         /* Secciones */
+         section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            opacity: 0;
+            transform: translateY(50px);
+            z-index: 9;
+        }
+
+        section img{
+            height: 600px;
+            position: absolute;
+            bottom: 0;
+            right: 30%;
+            transform: translate(50%, 0);
+        }
+        /* Cuando una sección es visible */
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
 </head>
 <body>
+    <header>
+        <nav>
+            <ul>
+                <li class="item-1"><a href="game.html">Perfil</a></li>
+                <li class="item-2"><a href="#projects">Proyectos</a></li>
+                <li class="item-3"><a href="#Redes">Redes</a></li>
+            </ul>
+        </nav>
+    </header>
+    
 
-  <div id="nombre-canal">Cargando canal...</div>
-  <video id="tv" autoplay muted playsinline controls="false"></video>
+    <!-- Fondo animado -->
+    <div class="circle-bg"></div>
+    <div class="circle-border"></div>
+    <div class="circle-border2"></div>
+    <main>
+        <section id="perfil" data-bg="#fff">
+            <img src="https://camp.ucss.edu.pe/linternamagica/files/2016/08/The-Last-Naruto-the-Movie-Naruto.png" alt="">
+            <a href="game.html" class="line-animado">Perfil</a>
+        </section>
+        <section id="projects" data-bg="#c3e6cb">
+            <img src="https://i.redd.it/which-version-do-you-all-prefer-sp-to-draw-sasuke-in-future-v0-mya18ilzs3ed1.png?width=714&format=png&auto=webp&s=c37f52765914fab1e34e6acf1ff45e9fc8b4cbc0" alt="">
+            <a href="" class="line-animado">Proyectos</a>
+        </section>
+        <section id="Redes" data-bg="#bee5eb">
+            <img src="https://pngimg.com/d/naruto_PNG2.png" alt="">
+            <a href="" class="line-animado">Redes</a>
+        </section>
+    </main>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const navItems = document.querySelectorAll("nav ul li");
+            const sections = document.querySelectorAll("section");
 
-  <script>
-    const canales = [
-    {
-    nombre: "A",
-    url: "http://190.2.212.209:8050/play/a0p1"
-  },
-    {
-    nombre: "Frecuencia Latina",
-    url: "https://redirector.rudo.video/hls-video/567ffde3fa319fadf3419efda25619456231dfea/latina/latina.smil/playlist.m3u8"
-  },
-  {
-    nombre: "Latina Clasicos",
-    url: "https://redirector.rudo.video/hls-video/plus226/latina2/latina2.smil/playlist.m3u8"
-  },
-  {
-    nombre: "TV Perú",
-    url: "https://cdnhd.iblups.com/hls/777b4d4cc0984575a7d14f6ee57dbcaf.m3u8"
-  },
-  {
-    nombre: "ATV",
-    url: "https://alba-pe-atv-atv.stream.mediatiquestream.com/index.m3u8"
-  },
-  {
-    nombre: "ATV+",
-    url: "https://alba-pe-atv-atvmas.stream.mediatiquestream.com/index.m3u8"
-  },
-  {
-    nombre: "Milenial TV",
-    url: "https://www.milenial.news/salida/milenial.m3u8"
-  },
-  {
-    nombre: "Planeta TV",
-    url: "https://live.obslivestream.com/planetatv/index.m3u8"
-  },
-  {
-    nombre: "Panamericana TV",
-    url: "https://panamericana.pe/live/panamericana.m3u8"
-  },
-  {
-    nombre: "Global TV",
-    url: "https://www.globaltv.pe/live/stream.m3u8"
-  }
-];
+            // Mostrar los ítems del menú con animación
+            setTimeout(() => {
+                navItems.forEach(item => item.classList.add("visible"));
+            }, 500);
 
+            // Resaltar el enlace activo en función del scroll
+            function updateActiveNavItem() {
+                let scrollPosition = window.scrollY;
+                
+                sections.forEach((section, index) => {
+                    const sectionTop = section.offsetTop - window.innerHeight / 3; // Detectar antes de llegar
+                    const sectionHeight = section.clientHeight;
 
-    const video = document.getElementById('tv');
-    const nombreCanal = document.getElementById('nombre-canal');
-    let canalActual = 0;
-    let hls;
-
-    function cargarCanal(index) {
-      const canal = canales[index];
-      if (!canal) return;
-
-      nombreCanal.textContent = canal.nombre;
-
-      if (hls) {
-        hls.destroy();
-      }
-
-      if (Hls.isSupported()) {
-        hls = new Hls();
-        hls.loadSource(canal.url);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          video.play().catch(err => {
-            console.warn('Autoplay bloqueado (manifest):', err);
-          });
-        });
-      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = canal.url;
-        video.addEventListener('loadedmetadata', () => {
-          video.play().catch(err => {
-            console.warn('Autoplay bloqueado (native):', err);
-          });
-        });
-      } else {
-        alert('Tu navegador no soporta video en vivo HLS (.m3u8)');
-      }
-
-      // Reintento adicional por si el autoplay no funciona
-      setTimeout(() => {
-        video.play().catch(err => {
-          console.warn('Autoplay bloqueado (extra intento):', err);
-        });
-      }, 500);
-    }
-
-    // Inicializa el video al cargar la página
-    window.addEventListener('load', () => {
-      video.muted = false;
-      video.controls = false;
-      cargarCanal(canalActual);
-    });
-
-    // Cambio de canal por teclado
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight') {
-            canalActual = (canalActual + 1) % canales.length;
-            cargarCanal(canalActual);
-        } else if (e.key === 'ArrowLeft') {
-            canalActual = (canalActual - 1 + canales.length) % canales.length;
-            cargarCanal(canalActual);
-        } else if (e.key.toLowerCase() === 'f') {
-            if (!document.fullscreenElement) {
-            video.requestFullscreen();
-            } else {
-            document.exitFullscreen();
+                    if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                        navItems.forEach(item => item.classList.remove("active"));
+                        navItems[index].classList.add("active");
+                    }
+                });
             }
-        } else if (e.key === 'ArrowUp') {
-            video.volume = Math.min(video.volume + 0.1, 1);
-        } else if (e.key === 'ArrowDown') {
-            video.volume = Math.max(video.volume - 0.1, 0);
-        }else if (e.key.toLowerCase() === 'm') {
-            // Alterna entre mutear y desmutear
-            video.muted = !video.muted;
-        }
-    });
 
-  </script>
+            // Detectar el scroll para activar la animación de entrada en las secciones
+            function revealSections() {
+                sections.forEach(section => {
+                    const sectionTop = section.getBoundingClientRect().top;
+                    const windowHeight = window.innerHeight;
+
+                    if (sectionTop < windowHeight - 100) {
+                        section.classList.add("visible");
+                    }
+                });
+            }
+
+            // Scroll suave entre secciones con una sola bajada
+            let isScrolling = false;
+
+            window.addEventListener("wheel", (event) => {
+                if (isScrolling) return;
+
+                isScrolling = true;
+                requestAnimationFrame(() => (isScrolling = false)); // Optimiza la respuesta
+
+                let currentSectionIndex = [...sections].findIndex(section => {
+                    return window.scrollY < section.offsetTop + section.clientHeight - 50;
+                });
+
+                if (event.deltaY > 0 && currentSectionIndex < sections.length - 1) {
+                    sections[currentSectionIndex + 1].scrollIntoView({ behavior: "smooth" });
+                } else if (event.deltaY < 0 && currentSectionIndex > 0) {
+                    sections[currentSectionIndex - 1].scrollIntoView({ behavior: "smooth" });
+                }
+            });
+
+
+            // Evento de scroll para resaltar menú y revelar secciones
+            window.addEventListener("scroll", () => {
+                updateActiveNavItem();
+                revealSections();
+            });
+
+            updateActiveNavItem(); // Para actualizar en la carga
+            revealSections(); // Activar animación en la carga
+        });
+        document.addEventListener("DOMContentLoaded", () => {
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+            }, 50);
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const sections = document.querySelectorAll("section");
+            const circleBg = document.querySelector(".circle-bg");
+            const circleBorder = document.querySelector(".circle-border");
+            const circleBorder2 = document.querySelector(".circle-border2");
+
+            function updateBackground() {
+                let scrollPosition = window.scrollY;
+
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop - window.innerHeight / 3;
+                    const sectionHeight = section.clientHeight;
+
+                    if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                        const color = section.getAttribute("data-bg");
+                        circleBg.style.background = color;
+                        circleBg.style.clipPath = "circle(0% at center)"; // Contrae el círculo
+
+                        setTimeout(() => {
+                            circleBg.style.clipPath = "circle(150% at center)";
+                        }, 800);
+                        
+                        // Corrección: Usar transform en lugar de clipPath
+                        circleBorder.style.transform = "translate(-50%, -50%) scale(0)"; // Contrae el círculo
+                        setTimeout(() => {
+                            circleBorder.style.transform = "translate(-50%, -50%) scale(2)"; // Expande el círculo
+                        }, 1200);
+
+                        // Corrección: Usar transform en lugar de clipPath
+                        circleBorder2.style.transform = "translate(-50%, -50%) scale(0)"; // Contrae el círculo
+                        setTimeout(() => {
+                            circleBorder2.style.transform = "translate(-50%, -50%) scale(1.9)"; // Expande el círculo
+                        }, 1200);
+                    }
+                });
+            }
+
+            window.addEventListener("scroll", updateBackground);
+            updateBackground();
+        });
+    </script>
+    <script>
+        window.addEventListener("load", function() {
+        var script = document.createElement("script");
+        script.src = "https://static.landbot.io/landbot-widget/landbot-widget.js";
+        script.onload = function() {
+            new Landbot.Widget({
+            configUrl: "https://chats.landbot.io/v3/H-ABCDE12345/index.json", // Reemplaza con el tuyo
+            });
+        };
+        document.body.appendChild(script);
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+          document.querySelector("section a[href='game.html']").addEventListener("click", function (event) {
+              event.preventDefault(); 
+              gsap.to("nav", {
+                  y: "-100vw",
+                  duration: 1,
+                  ease: "power2.inOut",
+                  onComplete: () => {
+                      window.location.href = "game.html";
+                  }
+              }
+            ),gsap.to("section a", {
+                  y: "-100vw",
+                  duration: 1,
+                  ease: "power2.inOut",
+                  onComplete: () => {
+                      window.location.href = "game.html";
+                  }
+              }
+            ),gsap.to("section img", {
+                  x: "-100vw",
+                  duration: 1,
+                  ease: "power2.inOut",
+                  onComplete: () => {
+                      window.location.href = "game.html";
+                  }
+              }
+            );
+          });
+      </script>
+      <script>
+        document.querySelector("a").removeAttribute("href")
+    </script>
 </body>
 </html>
