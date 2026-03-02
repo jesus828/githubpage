@@ -21,7 +21,7 @@
   border: 1px solid #ccc;
   border-radius: 6px;
   overflow: visible;
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
   background: #fff;
 }
@@ -43,7 +43,8 @@
   display: block;
   text-align: left;
 }
-.sb-field input[type="date"] {
+.sb-field input[type="date"],
+.sb-field select {
   border: none;
   outline: none;
   font-size: 14px;
@@ -52,6 +53,8 @@
   background: transparent;
   padding: 0;
   cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
 }
 .sb-guests-wrap {
   flex: 1.4;
@@ -158,7 +161,7 @@
 }
 .sb-btn:hover { background: #1e3a1e; }
 
-@media (max-width: 680px) {
+@media (max-width: 700px) {
   .sb-form { flex-direction: column; }
   .sb-field, .sb-guests-wrap, .sb-promo { border-right: none; border-bottom: 1px solid #ddd; }
   .sb-btn { padding: 14px; justify-content: center; border-radius: 0 0 6px 6px; }
@@ -171,19 +174,31 @@
 
   <div class="sb-form">
 
+    <!-- Propiedad -->
+    <div class="sb-field">
+      <label>Propiedad</label>
+      <select id="sbPropiedad">
+        <option value="sotupa">Andean Wings Sotupa Eco Lodge</option>
+        <option value="valley">Andean Wings Valley</option>
+      </select>
+    </div>
+
+    <!-- Llegada -->
     <div class="sb-field">
       <label>Llegada</label>
       <input type="date" id="sb-checkin">
     </div>
 
+    <!-- Salida -->
     <div class="sb-field">
       <label>Salida</label>
       <input type="date" id="sb-checkout">
     </div>
 
+    <!-- Huéspedes -->
     <div class="sb-guests-wrap" id="sbGuestsWrap">
       <label>Huéspedes</label>
-      <div class="sb-guests-display" id="sbGuestsDisplay">2 adultos · 0 niños</div>
+      <div class="sb-guests-display" id="sbGuestsDisplay">2 adultos · 0 niños · 1 hab.</div>
       <div class="sb-dropdown" id="sbDropdown">
         <div class="sb-counter">
           <span class="sb-counter-label">Adultos</span>
@@ -201,17 +216,24 @@
             <button id="sb-children-plus">+</button>
           </div>
         </div>
+        <div class="sb-counter">
+          <span class="sb-counter-label">Habitaciones</span>
+          <div class="sb-counter-controls">
+            <button id="sb-rooms-minus">−</button>
+            <span class="sbcount" id="sbRooms">1</span>
+            <button id="sb-rooms-plus">+</button>
+          </div>
+        </div>
       </div>
     </div>
 
+    <!-- Código promo -->
     <div class="sb-promo">
       <label>Código Promocional</label>
       <input type="text" id="sbPromo" placeholder="Opcional">
     </div>
 
-    <button class="sb-btn" id="sbVerTarifas">
-      Ver Tarifas &#128269;
-    </button>
+    <button class="sb-btn" id="sbVerTarifas">Ver Tarifas &#128269;</button>
 
   </div>
 </div>
@@ -219,30 +241,36 @@
 <script>
 (function() {
 
-  // ── CONFIGURACIÓN ─────────────────────────────────────
-  var BASE_URL  = "https://www.simplebooking.it/ibe2/hotel/10870";
-  var LANG      = "ES";
-  var CUR       = "PEN";
-  // ──────────────────────────────────────────────────────
+  // ── CONFIGURACIÓN PROPIEDADES ──────────────────────────────────
+  var PROPIEDADES = {
+    sotupa: "https://andeanwingssotupaecolodge.reservadirecto.com/lp.html?pos=AndeanWingsSotupaEcoLodge&webcache=off&tag=PmsLink&appID=111",
+    valley: "https://andeanwingsvalley3d6.reservadirecto.com/lp.html?pos=AndeanWingsValley3d6&webcache=off&tag=PmsLink&appID=111"
+  };
+  // ──────────────────────────────────────────────────────────────
 
   var adults   = 2;
   var children = 0;
+  var rooms    = 1;
 
   function updateDisplay() {
     var txt = adults + ' adulto' + (adults !== 1 ? 's' : '');
     txt += ' · ' + children + ' niño' + (children !== 1 ? 's' : '');
+    txt += ' · ' + rooms + ' hab.';
     document.getElementById('sbGuestsDisplay').textContent = txt;
     document.getElementById('sbAdults').textContent   = adults;
     document.getElementById('sbChildren').textContent = children;
+    document.getElementById('sbRooms').textContent    = rooms;
   }
 
-  // Botones contador
+  // Contadores
   document.getElementById('sb-adults-minus').addEventListener('click',   function(e){ e.stopPropagation(); adults   = Math.max(1, adults-1);   updateDisplay(); });
   document.getElementById('sb-adults-plus').addEventListener('click',    function(e){ e.stopPropagation(); adults++;                           updateDisplay(); });
   document.getElementById('sb-children-minus').addEventListener('click', function(e){ e.stopPropagation(); children = Math.max(0, children-1); updateDisplay(); });
   document.getElementById('sb-children-plus').addEventListener('click',  function(e){ e.stopPropagation(); children++;                         updateDisplay(); });
+  document.getElementById('sb-rooms-minus').addEventListener('click',    function(e){ e.stopPropagation(); rooms    = Math.max(1, rooms-1);    updateDisplay(); });
+  document.getElementById('sb-rooms-plus').addEventListener('click',     function(e){ e.stopPropagation(); rooms++;                            updateDisplay(); });
 
-  // Toggle dropdown
+  // Toggle dropdown huéspedes
   document.getElementById('sbGuestsWrap').addEventListener('click', function() {
     document.getElementById('sbDropdown').classList.toggle('open');
   });
@@ -254,7 +282,7 @@
     }
   });
 
-  // Fechas por defecto: hoy y mañana
+  // Fechas por defecto
   function fmt(d) {
     return d.getFullYear() + '-'
       + String(d.getMonth()+1).padStart(2,'0') + '-'
@@ -278,9 +306,10 @@
 
   // Botón Ver Tarifas
   document.getElementById('sbVerTarifas').addEventListener('click', function() {
-    var checkin  = document.getElementById('sb-checkin').value;
-    var checkout = document.getElementById('sb-checkout').value;
-    var promo    = document.getElementById('sbPromo').value;
+    var propiedad = document.getElementById('sbPropiedad').value;
+    var checkin   = document.getElementById('sb-checkin').value;
+    var checkout  = document.getElementById('sb-checkout').value;
+    var promo     = document.getElementById('sbPromo').value;
 
     if (!checkin || !checkout) {
       alert('Por favor selecciona las fechas de llegada y salida.');
@@ -291,18 +320,14 @@
       return;
     }
 
-    // Construir guests: A por adulto, C por niño
-    var guests = [];
-    for (var i = 0; i < adults; i++)   guests.push('A');
-    for (var i = 0; i < children; i++) guests.push('C');
+    var url = PROPIEDADES[propiedad]
+      + '&checkin='  + checkin
+      + '&checkout=' + checkout
+      + '&adults='   + adults
+      + '&children=' + children
+      + '&rooms='    + rooms;
 
-    var url = BASE_URL
-      + '?lang='   + LANG
-      + '&cur='    + CUR
-      + '&guests=' + guests.join(',')
-      + '&in='     + checkin
-      + '&out='    + checkout
-      + '&coupon=' + encodeURIComponent(promo);
+    if (promo) url += '&promo_code=' + encodeURIComponent(promo);
 
     window.open(url, '_blank');
   });
